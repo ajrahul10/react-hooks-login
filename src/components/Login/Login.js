@@ -14,55 +14,72 @@ const emailReducer = (state, action) => {
   return { value: '', isValid: false };
 }
 
+const passReducer = (state, action) => {
+  if (action.type === 'PASS_CHANGE') {
+    return { value: action.val, isValid: action.val.length > 6 };
+  }
+  if (action.type === 'PASS_BLUR') {
+    return { value: state.value, isValid: state.value.length > 6 };
+  }
+  return { value: '', isValid: false };
+}
+
 const Login = (props) => {
-  const [enteredPassword, setEnteredPassword] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
   const [emailEntered, emailDispatch] = useReducer(emailReducer,
     { value: '', isValid: null });
 
-  // useEffect(() => {
-  //   const formValidityTimout = setTimeout(() => {
-  //     // console.log('Checking form validity!!');
-  //     setFormIsValid(
-  //       enteredEmail.includes('@') && enteredPassword.trim().length > 6
-  //     );
-  //   }, 500);
+  const [passEntered, passDispatch] = useReducer(passReducer,
+    { value: '', isValid: null });
 
-  //   return () => {
-  //     // console.log('CLEANUP');
-  //     clearTimeout(formValidityTimout);
-  //   }
-  // }, [enteredEmail, enteredPassword])
+  const { isValid: emailIsValid } = emailEntered;
+  const { isValid: passIsValid } = passEntered;
+
+  useEffect(() => {
+    const formValidityTimout = setTimeout(() => {
+      console.log('Checking form validity!!');
+      setFormIsValid(
+        emailIsValid && passIsValid
+      );
+    }, 1500);
+
+    return () => {
+      console.log('CLEANUP');
+      clearTimeout(formValidityTimout);
+    }
+  }, [emailIsValid, passIsValid])
 
   const emailChangeHandler = (event) => {
-    emailDispatch({type: 'EMAIL_CHANGE', val: event.target.value});
+    emailDispatch({ type: 'EMAIL_CHANGE', val: event.target.value });
 
-    setFormIsValid(
-      emailEntered.isValid && enteredPassword.trim().length > 6
-    );
+    // setFormIsValid(
+    //   event.target.value.includes('@') && passEntered.isValid
+    // );
   };
 
   const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
+    passDispatch({
+      type: 'PASS_CHANGE',
+      val: event.target.value
+    });
 
-    setFormIsValid(
-      emailEntered.isValid && event.target.value.trim().length > 6
-    );
+    // setFormIsValid(
+    //   emailEntered.isValid && event.target.value.length > 6
+    // );
   };
 
   const validateEmailHandler = () => {
-    emailDispatch({type: 'EMAIL_BLUR'});
+    emailDispatch({ type: 'EMAIL_BLUR' });
   };
 
   const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
+    passDispatch({ type: 'PASS_BLUR' })
   };
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailEntered, enteredPassword);
+    props.onLogin(emailEntered.value, passEntered.value);
   };
 
   return (
@@ -82,14 +99,14 @@ const Login = (props) => {
           />
         </div>
         <div
-          className={`${classes.control} ${passwordIsValid === false ? classes.invalid : ''
+          className={`${classes.control} ${passEntered.isValid === false ? classes.invalid : ''
             }`}
         >
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
-            value={enteredPassword}
+            value={passEntered.value}
             onChange={passwordChangeHandler}
             onBlur={validatePasswordHandler}
           />
