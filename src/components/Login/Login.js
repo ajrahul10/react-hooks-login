@@ -42,7 +42,7 @@ const Login = (props) => {
       setFormIsValid(
         emailIsValid && passIsValid
       );
-    }, 1500);
+    }, 500);
 
     return () => {
       console.log('CLEANUP');
@@ -59,10 +59,7 @@ const Login = (props) => {
   };
 
   const passwordChangeHandler = (event) => {
-    passDispatch({
-      type: 'PASS_CHANGE',
-      val: event.target.value
-    });
+    passDispatch({ type: 'PASS_CHANGE', val: event.target.value });
 
     // setFormIsValid(
     //   emailEntered.isValid && event.target.value.length > 6
