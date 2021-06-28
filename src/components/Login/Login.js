@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useContext } from 'react';
 
+import AuthContext from '../../store/user-context';
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
@@ -35,6 +36,8 @@ const Login = (props) => {
 
   const { isValid: emailIsValid } = emailEntered;
   const { isValid: passIsValid } = passEntered;
+
+  const authCtx = useContext(AuthContext);
 
   useEffect(() => {
     const formValidityTimout = setTimeout(() => {
@@ -76,7 +79,7 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailEntered.value, passEntered.value);
+    authCtx.onLogin(emailEntered.value, passEntered.value);
   };
 
   return (
